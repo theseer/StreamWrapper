@@ -75,9 +75,10 @@ namespace TheSeer\Tools {
             $this->dh=0;
         }
 
-        protected function translate($uri) {
+        public function translate($uri) {
             $res = new StreamUri($uri);
-            return self::$properties[$res->protocol]->baseDir . '/' . $res->path;
+            $separator = $res->path != '' ? '/' : '';
+            return self::$properties[$res->protocol]->baseDir . $separator . $res->path;
         }
 
         public function stream_open($path, $mode, $options, &$opened_path) {
@@ -136,7 +137,7 @@ namespace TheSeer\Tools {
         }
 
         public function mkdir($path, $mode, $options) {
-            return mkdir($this->translate($path), $mode, $options);
+            return mkdir($this->translate($path), 0775, $options & STREAM_MKDIR_RECURSIVE);
         }
 
         public function rmdir($path, $options) {
