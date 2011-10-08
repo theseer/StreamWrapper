@@ -62,7 +62,7 @@ namespace TheSeer\Tools {
                 throw new StreamManagerException("'$proto' is already registered.", StreamManagerException::AlreadyRegistered);
             }
             $config = new StreamProperties($proto);
-            $this->streams[$proto] = $config;
+            $this->streams[$proto] = array('cfg' => $config, 'class' => $class);
             $class::setProperties($config);
             stream_wrapper_register($proto,  $class);
             return $config;
@@ -74,10 +74,17 @@ namespace TheSeer\Tools {
         }
 
         public function getStreamProperties($proto) {
-            if (!isset($this->stream[$proto])) {
+            if (!isset($this->streams[$proto])) {
                 throw new StreamManagerException("Protocol '$proto' not registered with StreamManager", StreamManagerException::NotRegistered);
             }
-            return $this->streams[$proto];
+            return $this->streams[$proto]['cfg'];
+        }
+
+        public function getInstanceFor($proto) {
+            if (!isset($this->streams[$proto])) {
+                throw new StreamManagerException("Protocol '$proto' not registered with StreamManager", StreamManagerException::NotRegistered);
+            }
+            return new $this->streams[$proto]['class'];
         }
 
     }
